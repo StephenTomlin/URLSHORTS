@@ -4,8 +4,10 @@ let app = express();
 let PORT = 8080; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
-var methodOverride = require('method-override')
-app.use(methodOverride('_method'))
+var methodOverride = require('method-override');
+app.use(methodOverride('_method'));
+const MongoClient = require("mongodb").MongoClient;
+const MONGODB_URI = "mongodb://127.0.0.1:27017/url_shortener";
 
 
 
@@ -51,15 +53,32 @@ app.get("/u/:shortURL", (req, res) => {
 });
 
 app.get("/urls/:id", (req, res) => {
+
+  MongoClient.connect(MONGODB_URI, (err, db) => {
+
+  if (err) {
+    console.log('Could not connect! Unexpected error. Details below.');
+    throw err;
+  }
+
+  console.log('Connected to the database!');
+  let collection = db.collection("urls");
+
+  console.log('Retreiving documents for the "urls" collection...');
+  collection.find().toArray((err, results) => {
+    console.log('results: ', results);
+
+    console.log('Disconnecting from Mongo!');
+    db.close();
+
+  });
+});
+
   res.render("urls_show", { shortURL: req.params.id });
 });
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.end ("<html><body><h1>Hello </h1><b>World</b></body></html>\n");
 });
 
 app.delete("/urls/:id",(req, res) => {
@@ -68,12 +87,7 @@ app.delete("/urls/:id",(req, res) => {
 });
 
 app.put("/urls/:id", (req, res) => {
-  console.log(req)
-  let newID = generateRandomString();
-  if (urlDatabase.hasOwnProperty(req.params.id)) {
-    urlDatabase[newID] = urlDatabase[req.params.id];
-    delete urlDatabase[req.params.id];
-  }
+  urlDatabase[req.params.id] = req.body.longURL
   res.redirect("/urls")
 })
 

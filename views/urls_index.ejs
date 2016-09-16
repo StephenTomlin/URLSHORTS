@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html>''
 <html lang="en">
 <head>
   <% include partials/_header.ejs %>
@@ -11,10 +11,10 @@
         <input type="hidden" name="_method" value="DELETE">
         <button style="padding-left:250px;" type ="submit">DELETE</button>
         </form>
-        <form method="POST" action="/urls/<%=keys%>?_method=PUT">
-        <input type="hidden" name="_method" value="PUT">
-        <button style="padding-left:250px;" type="submit">UPDATE</button>
-        </form>
+       <!--  <form method="POST" action="/urls/<%=keys%>?_method=PUT">
+        <input type="hidden" name="_method" value="PUT"> -->
+        <button><a href=" <%= `/urls/${keys}` %> ">EDIT</a></button>
+      <!--   </form> -->
     <% }; %>
   </ul>
 

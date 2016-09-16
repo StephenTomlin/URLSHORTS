@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <% include partials/_header.ejs %>
+</head>
+<body style="width:250px">
+  <ul>
+    <% for (keys in urls){%>
+        <li><%= keys %> - <%= urls[keys]%></li>
+        <form method="POST" action="/urls/<%=keys%>?_method=DELETE">
+        <input type="hidden" name="_method" value="DELETE">
+        <button style="padding-left:250px;" type ="submit">DELETE</button>
+        </form>
+        <form method="POST" action="/urls/<%=keys%>?_method=PUT">
+        <input type="hidden" name="_method" value="PUT">
+        <button style="padding-left:250px;" type="submit">UPDATE</button>
+        </form>
+    <% }; %>
+  </ul>
+
+</body>
+</html>

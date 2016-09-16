@@ -7,7 +7,7 @@
   <p> <%= shortURL %></p>
   <form method="POST" action="/urls/<%=shortURL%>?_method=PUT">
         <input type="hidden" name="_method" value="PUT">
-        <input id="longURL" type="text" name="longURL" placeholder="http://" style="width: 300px">
+        <input id="longURL" type="text" name="thisinput" placeholder="http://" style="width: 300px">
         <input type="submit" value="Submit">
   </form>
 </body>

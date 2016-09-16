@@ -5,17 +5,16 @@
 </head>
 <body style="width:250px">
   <ul>
-    <% for (keys in urls){%>
-        <li><%= keys %> - <%= urls[keys]%></li>
-        <form method="POST" action="/urls/<%=keys%>?_method=DELETE">
+    <% url.forEach( (url) => {%>
+        <li><%= url.shortURL %> - <%= url.longURL%></li>
+        <form method="POST" action="/urls/<%=url.shortURL%>?_method=DELETE">
         <input type="hidden" name="_method" value="DELETE">
         <button style="padding-left:250px;" type ="submit">DELETE</button>
         </form>
-       <!--  <form method="POST" action="/urls/<%=keys%>?_method=PUT">
-        <input type="hidden" name="_method" value="PUT"> -->
-        <button><a href=" <%= `/urls/${keys}` %> ">EDIT</a></button>
-      <!--   </form> -->
-    <% }; %>
+        <form>
+        <button><a href="<%= `/urls/${url.shortURL}` %>">EDIT</a></button>
+        </form>
+    <% }); %>
   </ul>
 
 </body>

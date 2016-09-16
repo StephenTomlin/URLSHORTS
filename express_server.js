@@ -1,7 +1,8 @@
 'use strict'
 let express = require("express");
 let app = express();
-let PORT = 8080; // default port 8080
+let PORT = 8080;
+let collection; // default port 8080
 const bodyParser = require("body-parser");
 app.use(bodyParser.urlencoded({extended: true}));
 var methodOverride = require('method-override');
@@ -19,12 +20,24 @@ function generateRandomString() {
     return text;
 }
 
-
-
 let urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
 };
+
+
+MongoClient.connect(MONGODB_URI, (err, db) => {
+  if (err) {
+    console.log('Could not connect! Unexpected error. Details below.');
+    throw err;
+  }
+  collection = db.collection('urls');
+});
+
+
+
+
+
 app.set('view engine','ejs')
 
 app.get("/", (req, res) => {
@@ -34,7 +47,9 @@ app.get("/", (req, res) => {
 
 app.get("/urls", (req, res) => {
   let templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
+  collection.find().toArray((err, url) => {
+    res.render("urls_index", {url: url});
+  });
 });
 
 app.get("/urls/new", (req, res) => {
@@ -42,54 +57,39 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post('/urls', (req, res) => {
-  var newString = generateRandomString()
-  urlDatabase[newString] = req.body.longURL;
+  var newString = generateRandomString();
+  collection.insert({
+    shortURL: newString,
+    longURL: req.body.thisinput
+  });
   res.redirect(`http://localhost:8080/urls/${newString}`);
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL]
+  let longURL = urlDatabase[req.params.shortURL];
   res.redirect(longURL);
 });
 
 app.get("/urls/:id", (req, res) => {
-
-  MongoClient.connect(MONGODB_URI, (err, db) => {
-
-  if (err) {
-    console.log('Could not connect! Unexpected error. Details below.');
-    throw err;
-  }
-
-  console.log('Connected to the database!');
-  let collection = db.collection("urls");
-
-  console.log('Retreiving documents for the "urls" collection...');
-  collection.find().toArray((err, results) => {
-    console.log('results: ', results);
-
-    console.log('Disconnecting from Mongo!');
-    db.close();
-
-  });
-});
-
-  res.render("urls_show", { shortURL: req.params.id });
-});
-
-app.get("/urls.json", (req, res) => {
-  res.json(urlDatabase);
+  console.log(req.params)
+  collection.findOne({shortURL: req.params.id}, (err, url) => {
+    console.log(url)
+    res.render("urls_show", {shortURL: req.params.id});
+  })
 });
 
 app.delete("/urls/:id",(req, res) => {
-  delete urlDatabase[req.params.id]
-  res.redirect("/urls")
+  collection.remove({shortURL: req.params.id});
+  res.redirect("/urls");
 });
 
 app.put("/urls/:id", (req, res) => {
-  urlDatabase[req.params.id] = req.body.longURL
+  collection.updateOne({ shortURL: req.params.id}, {
+    shortURL: req.params.id,
+    longURL: req.body.thisinput
+  });
   res.redirect("/urls")
-})
+});
 
 app.listen(PORT)
 console.log(`${PORT} is the magic port`);

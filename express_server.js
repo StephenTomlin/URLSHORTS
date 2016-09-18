@@ -4,7 +4,7 @@ let app = express();
 let PORT = 8080;
 let collection; // default port 8080
 const bodyParser = require("body-parser");
-const env = require('dotenv').config();
+require('dotenv').config();
 app.use(bodyParser.urlencoded({extended: true}));
 var methodOverride = require('method-override');
 app.use(methodOverride('_method'));

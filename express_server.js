@@ -1,5 +1,5 @@
 'use strict'
-require('dotenv').config({path: '/home/stephen/lighthouse/week2day3/Project2/.env'});
+require('dotenv').config();
 let express = require("express");
 let app = express();
 let PORT = 8080;

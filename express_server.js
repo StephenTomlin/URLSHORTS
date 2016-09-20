@@ -21,10 +21,6 @@ function generateRandomString() {
     return text;
 }
 
-let urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
 
 
 MongoClient.connect(MONGODB_URI, (err, db) => {
@@ -42,12 +38,10 @@ MongoClient.connect(MONGODB_URI, (err, db) => {
 app.set('view engine','ejs')
 
 app.get("/", (req, res) => {
-  let templateVars = { urls: urlDatabase };
-  res.render("urls_index", templateVars);
+  res.redirect("urls_index");
 });
 
 app.get("/urls", (req, res) => {
-  let templateVars = { urls: urlDatabase };
   collection.find().toArray((err, url) => {
     res.render("urls_index", {url: url});
   });
@@ -67,8 +61,9 @@ app.post('/urls', (req, res) => {
 });
 
 app.get("/u/:shortURL", (req, res) => {
-  let longURL = urlDatabase[req.params.shortURL];
-  res.redirect(longURL);
+  collection.findOne({shortURL:req.params.shortURL}, (err, url) => {
+    res.redirect(url.longURL);
+  });
 });
 
 app.get("/urls/:id", (req, res) => {
